@@ -1,0 +1,16 @@
+com.google.android.gms.location.history|Location History|system/product/app/GoogleLocationHistory|trim
+com.google.mainline.go.telemetry|Go telemetry|system/product/app/com.google.mainline.go.telemetry|trim
+com.google.android.feedback|Google Feedback|system/system_ext/priv-app/GoogleFeedback|trim
+com.google.android.gms|Google Play services|system/product/priv-app/GmsCoreGo|full
+com.google.android.gsf|Google Services Framework|system/system_ext/priv-app/GoogleServicesFramework|full
+com.android.vending|Play Store|system/product/priv-app/Phonesky|full
+com.google.android.partnersetup|Partner Setup|system/product/priv-app/GooglePartnerSetup|full
+com.google.android.apps.turbo|Device Health Services|system/product/priv-app/Turbo|full
+com.google.android.configupdater|ConfigUpdater|system/product/priv-app/ConfigUpdater|full
+com.google.android.onetimeinitializer|One Time Initializer|system/product/priv-app/GoogleOneTimeInitializer|full
+com.google.android.apps.restore|Google Restore|system/product/priv-app/GoogleRestore|full
+com.google.android.apps.assistant|Assistant Go|system/product/priv-app/AssistantGo|full
+com.google.android.apps.searchlite|Google Search Go|system/product/priv-app/GoogleSearchGo|full
+com.google.android.as|Android System Intelligence|system/product/priv-app/AndroidSystemIntelligence system/product/overlay/GmsConfigOverlayASI.apk system/product/etc/sysconfig/asi_features.xml|intelligence
+com.google.android.as.oss|Private Compute Services|system/product/priv-app/PrivateComputeServices|intelligence
+com.google.android.projection.gearhead|Android Auto|system/product/priv-app/AndroidAutoStub|auto

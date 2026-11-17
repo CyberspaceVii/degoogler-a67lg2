@@ -1,13 +1,27 @@
 # Degoogler
 
-**[Download degoogler-a67lg2.zip](https://github.com/CyberspaceVii/degoogler-a67lg2/releases/download/v0.3/degoogler-a67lg2.zip)**
+**[Download degoogler-a67lg2.zip](https://github.com/CyberspaceVii/degoogler-a67lg2/releases/download/v0.4/degoogler-a67lg2.zip)**
 
 
-*CyberspaceVII, October 2026. For the Foxxd A67L Gen 2 with KernelSU Next.*
+*CyberspaceVII. For the Foxxd A67L Gen 2 with KernelSU Next.*
 
 This module lets you choose how much Google to keep on the phone. It is **systemless**: it hides
 Google's preinstalled apps with the module and never writes to `/system`. Disable the module and
 reboot, and the hidden apps come back.
+
+## Firmware and upgrades
+
+Supports older firmware **1784605054** and **1790133188** with one package.
+Reviewed removal paths are covered even when absent on the older firmware, so
+an OTA cannot introduce ASI or the Android Auto stub outside a selected removal
+group. Home and Recents are preserved on both firmware versions.
+
+On an update, **Up or a 10-second timeout keeps previous choices**; Down opens
+the menu below. v0.3 choices are recognized too. Mode B now also removes
+intelligence and Android Auto. Existing microG replacements are kept using
+actual APK signing identities, rather than package names alone. Cancelling
+or failing an installation leaves the active choices and old cleanup marker
+untouched. New choices belong to the staged module until it is activated.
 
 ## Choosing during install
 
@@ -21,8 +35,8 @@ When you install the zip in the KSU Next app, a menu appears:
 
 The choices are **A**, **B**, **C** and **Cancel**. Choice B asks you to confirm with Volume Up
 a second time. Your choice only takes effect at the **next reboot**. If you change your mind before
-then, remove the module in KSU Next and nothing will have changed. (The one exception is B's backup,
-which is made during install. See below.)
+then, remove the module in KSU Next and nothing will have changed. (App backups are made
+during installation and retained. See below.)
 
 Every choice (A, B and C) removes three Google telemetry stubs:
 
@@ -30,19 +44,19 @@ Every choice (A, B and C) removes three Google telemetry stubs:
 - **Google Feedback** (crash and feedback uploads)
 - **Go telemetry** (a mainline telemetry marker)
 
-These have no user-facing function. Nothing else on the phone depends on them.
+These are the same three trim targets on both reviewed firmware versions.
 
 ---
 
 ## A. Keep Google, trim telemetry, Morphe with root mount
 
 **What it does:** removes the three telemetry stubs. Google Play services (GMS), the Play Store and
-every Google app stay.
+other Google apps stay unless you choose the optional removals below.
 
 **Impact:**
-- Everything keeps working: Google sign-in, Play Store, push notifications, Play Integrity (as far
-  as an unlocked phone gets it), Find My Device, Google backup.
-- The RAM saving is small. GMS (about 150 MB) and the Play Store (about 125 MB) are still running.
+- Google sign-in, Play Store, push notifications, Find My Device and Google
+  backup remain available. Play Integrity still depends on the device and apps.
+- GMS and the Play Store remain running. No RAM or battery saving is promised.
 
 **What you should do afterwards:**
 1. Turn off Google's own tracking in Settings → Google:
@@ -62,21 +76,38 @@ every Google app stay.
 
 ---
 
-## B. Full microG: remove Google Play services
+## Optional intelligence and Android Auto removal in A/C
+
+After choosing A or C, you can separately remove:
+
+- **Android System Intelligence and Private Compute Services**: removes their
+  stock apps and ASI's feature declaration and framework overlay together.
+  Smart text selection, predictions, captions, attention, autofill suggestions,
+  on-device speech and related features may be lost. Availability varies by device.
+- **Android Auto**: removes the preloaded car-integration stub and any recognized
+  updated copy. Car integration is lost.
+
+Up removes the shown group; Down or timeout keeps it. Both default to **keep**
+on a fresh A/C install. Private Compute Services was already present on older
+firmware; ASI and Android Auto are new on 1790133188. These choices leave the
+launcher and its Recents integration in place. The search bar may still appear;
+this module does not replace or modify the launcher.
+
+## B. Replace Google Play services with microG
 
 **What it does:**
 - Removes the three telemetry stubs.
 - Hides **Google Play services**, **Google Services Framework**, the **Play Store**, **Partner
   Setup**, **Device Health Services (Turbo)**, **ConfigUpdater**, **One Time Initializer**, **Google
-  Restore**, **Google Assistant Go** and **Google Search Go**. These depend on Play services and
-  would only crash without it.
-- **Makes a backup during install** (this is the only step that happens right away): the APKs and data
-  of Play services, the Play Store, Services Framework, Partner Setup, Restore and Search Go, saved to
-  `/data/adb/cyberspacevii/degoogler-a67lg2/backup-<date>/`. That's about 700 MB (683 MB when tested). It stays there even if you remove the
-  module. Delete it yourself once you're happy.
-- On the **first boot** after install, it uninstalls the Play-updated copies of those apps from
-  `/data/app` once. Otherwise they would linger as ordinary apps. The result is logged in
-  `/data/adb/cyberspacevii/degoogler-a67lg2/firstboot.log`.
+  Restore**, **Google Assistant Go** and **Google Search Go** as part of the
+  Google-services replacement profile.
+- Also removes **Android System Intelligence**, **Private Compute Services** and
+  the **Android Auto stub**, with ASI's framework overlay and feature declaration.
+- Backs up recognized selected apps before installation completes. After boot,
+  removes surviving updated copies only after signer, backup, content and version
+  checks. Checks repeat on subsequent boots, including after an OTA. Failures
+  remain pending and are logged; replacements such as microG are kept.
+
 
 **Impact (what you lose):**
 - **Google sign-in, the Play Store, Google backup and restore, Find My Device, Assistant, Google
@@ -86,11 +117,13 @@ every Google app stay.
   refuse to run. Integrity modules (Play Integrity Fix and the like) only matter with real Play
   services.
 - **Device Health Services (Turbo):** Adaptive Battery predictions.
+- **Intelligence features and Android Auto:** see the optional-removal descriptions above.
 - Apps that *require* Play services and aren't supported by microG may fail. microG covers most push
   notifications, Google sign-in, Maps API and location. It does not cover everything.
 
-**What you gain:** roughly 300-400 MB of RAM back (GMS + Play Store + Search/Assistant measured
-together on an A67L Gen 2). Background wakeups and network traffic to Google drop sharply.
+**What changes:** the selected Google processes and services are removed. RAM,
+battery and network impact depend on your apps and replacements; savings on
+the new firmware have not been measured.
 
 **What you must do after the reboot (in this order):**
 1. **Signature spoofing.** Stock Android 16 doesn't allow microG to pose as Google, so add it with
@@ -116,8 +149,11 @@ together on an A67L Gen 2). Background wakeups and network traffic to Google dro
    works with real microG. Use a standard (non-root) install, or a root mount if you prefer.
 
 **Caveats:**
-- **Install microG only after the first reboot.** The first-boot cleanup uninstalls whatever is
-  installed as `com.google.android.gms` at that moment.
+- Install microG after the first reboot, once stock Google services are absent.
+  Cleanup checks the actual APK signer and verified rotation lineage. A repeated
+  module update keeps microG instead of uninstalling it by package name.
+- This replaces the Google services stack; it does **not** remove every Google
+  app or every Google-provided system component.
 - microG uses the same package name as Google Play services but a different signature. You can never
   have both installed at once.
 - Apps you installed from the Play Store stay installed, but nothing updates them until you use
@@ -132,18 +168,19 @@ together on an A67L Gen 2). Background wakeups and network traffic to Google dro
    and the Play Store come back, with empty data.
 3. Open the Play Store, sign in again and let it update Google's apps. Your account data syncs back
    from Google. Local Play-services data does not.
-4. The backup in `/data/adb/cyberspacevii/degoogler-a67lg2/backup-<date>/` has the newer APKs. As root, you can reinstall
-   a package from it with
-   `pm install-multiple -r /data/adb/cyberspacevii/degoogler-a67lg2/backup-<date>/<package>/*.apk`.
-   The `data.tgz` / `user_de.tgz` archives are a last resort, for manual recovery only. Restoring app
-   data by hand needs the right owner and SELinux labels.
+4. New backups are under
+   `/data/adb/cyberspacevii/degoogler-a67lg2/backups/<package>/<fingerprint>/`.
+   Copy all APKs from a complete private backup to your computer using root
+   access, then run `adb install-multiple -r <local-backup-directory>/*.apk`. Existing v0.3 `backup-*`
+   directories are retained too. Data archives are for manual restoration with
+   correct ownership and SELinux labels; nothing is restored over microG automatically.
 
 ---
 
 ## C. Keep Google, trim telemetry, Morphe without root (MicroG-RE)
 
-**What it does on the phone:** exactly the same as **A**. It removes the three telemetry stubs, and
-Google stays. The difference is how you run patched apps.
+**What it does on the phone:** the same trim targets and optional removal groups as **A**.
+Google services stay. The difference is how you run patched apps.
 
 **Impact:** the same as A. On top of that, Morphe apps run on their **own** copy of microG next to
 real Play services. Two Play-services stacks on 3 GB of RAM is the worst choice for performance per
@@ -169,13 +206,42 @@ dollar. It's here because it doesn't depend on root mounts or on blocking Play u
 
 - **Do you need banking, payment or Wallet apps, or anything that checks Play Integrity?** Pick
   **A**.
-- **Don't need any of that, and want the phone fast and Google-free?** Pick **B**.
+- **Want to replace Google's services stack with microG?** Pick **B**.
 - **C** only if you want patched apps that survive without root.
 
 ## Undo, any choice
 
 In KSU Next, toggle the module **off** (or remove it) and reboot. Everything it hid comes back. For
 choice B, follow "To go back to Google" above.
+
+## Backups and cleanup status
+
+Selected stock apps are backed up during installation because hiding them may
+make Android discard their data at boot. Recognized updated copies are backed
+up before cleanup. Backups include numbered base/split APKs, their source paths,
+and available owner-user app data. These are live file copies, not guaranteed
+transaction-consistent app snapshots. Backup failure aborts installation or keeps
+a cleanup pending; it never authorizes deletion. Backups survive module removal.
+Additional Android users' data is outside the backup scope; updated-copy removal
+applies device-wide.
+
+`/data/adb/cyberspacevii/degoogler-a67lg2/cleanup.log` records cleanup;
+`cleanup-pending` records failures for the next boot. A stock APK still visible
+indicates a mount problem. Unknown signing identities are kept for manual review.
+Stock signing certificates from both reviewed firmware versions are pinned;
+Android's verified APK key-rotation history allows legitimate Play updates.
+
+## Build and validation
+
+Build the module from the checked-in source with:
+
+```sh
+python build.py --output /tmp/degoogler-a67lg2.zip
+python tests/test_module.py
+```
+
+The builder uses `ANDROID_SDK_ROOT` (default `/opt/android-sdk`), with
+`ANDROID_JAR`, `D8`, and `JAVAC` overrides. See [VALIDATION.md](VALIDATION.md).
 
 ## Links
 

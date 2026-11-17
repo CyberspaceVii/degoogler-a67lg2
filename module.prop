@@ -1,7 +1,7 @@
 id=degoogler_a67lg2
 name=Degoogler
-version=v0.3
-versionCode=3
+version=v0.4
+versionCode=4
 author=CyberspaceVII
 banner=https://cyberspace7.org/assets/ksun/imgs/degoogler-a67lg2.png
-description=Lets you choose how far to de-Google the phone during install: keep Google and trim its telemetry, or replace Google Play services with microG. Read the included README first. Disable this module to bring Google back.
+description=Keep Google and trim telemetry, optionally remove intelligence and Android Auto, or replace Google services with microG. Keeps your choices across firmware updates. Read the included README for setup and restoration.
